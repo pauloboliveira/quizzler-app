@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler_app/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -29,6 +30,42 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userPickerAnswer) {
+    bool correctAnswer = quizBrain.getQuestionAnswer();
+
+    setState(() {
+      if (userPickerAnswer == correctAnswer) {
+        scoreKeeper.add(
+          Icon(
+            Icons.check,
+            color: Colors.green,
+          ),
+        );
+      } else {
+        scoreKeeper.add(
+          Icon(
+            Icons.close,
+            color: Colors.red,
+          ),
+        );
+      }
+
+      bool finish = quizBrain.nextQuestion();
+      if (finish) {
+        Alert(
+            context: context,
+            title: 'Finished',
+            desc: 'You have reached the end of the quiz',
+            closeIcon: Icon(
+              Icons.close,
+            )).show();
+
+        scoreKeeper.clear();
+        quizBrain.setIndexListToZero();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,27 +102,7 @@ class _QuizPageState extends State<QuizPage> {
                   fontSize: 20.0,
                 ),
               ),
-              onPressed: () {
-
-                bool correctAnswer = quizBrain.getQuestionAnswer();
-
-                if(correctAnswer == true) {
-                  print('Right');
-                } else {
-                  print('Wrong');
-                }
-
-                setState(() {
-                  scoreKeeper.add(
-                    Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                  );
-
-                  quizBrain.nextQuestion();
-                });
-              },
+              onPressed: () => checkAnswer(true),
             ),
           ),
         ),
@@ -101,28 +118,7 @@ class _QuizPageState extends State<QuizPage> {
                   color: Colors.white,
                 ),
               ),
-              onPressed: () {
-
-                bool correctAnswer = quizBrain.getQuestionAnswer();
-
-                if(correctAnswer == false) {
-                  print('Right');
-                } else {
-                  print('Wrong');
-                }
-
-
-                setState(() {
-                  scoreKeeper.add(
-                    Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ),
-                  );
-
-                  quizBrain.nextQuestion();
-                });
-              },
+              onPressed: () => checkAnswer(false),
             ),
           ),
         ),
